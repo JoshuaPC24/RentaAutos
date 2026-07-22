@@ -4,8 +4,6 @@
  */
 package vista;
 
-
-import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -18,12 +16,14 @@ import logica.Vehiculo;
  *
  * @author jonat
  */
+
 public class DlgMainReserva extends javax.swing.JDialog {
 
     private ArrayList<Reserva> listaReserva;
     private ArrayList<Cliente> listaCliente;
     private ArrayList<Vehiculo> listaVeh;
     private DefaultTableModel model;
+
     /**
      * Creates new form DlgMainVehiculos
      */
@@ -34,7 +34,7 @@ public class DlgMainReserva extends javax.swing.JDialog {
         this.listaCliente = new ArrayList<>();
         this.listaVeh = new ArrayList<>();
     }
-    
+
     public DlgMainReserva(java.awt.Frame parent, boolean modal,
             ArrayList<Reserva> listaReserva, ArrayList<Cliente> listaCliente,
             ArrayList<Vehiculo> listaVeh) {
@@ -49,7 +49,6 @@ public class DlgMainReserva extends javax.swing.JDialog {
         return listaReserva;
     }
 
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -71,7 +70,7 @@ public class DlgMainReserva extends javax.swing.JDialog {
         txtCantReservas = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Gestión de Vehículos");
+        setTitle("Gestión de Reservas");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -200,11 +199,12 @@ public class DlgMainReserva extends javax.swing.JDialog {
 
     private void btnInsertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertarActionPerformed
         JFrame padre = (JFrame) this.getOwner();
-       
-        DlgNewVehiculo winNew = new DlgNewVehiculo(padre, true,listaVeh, 1);
-        winNew.setTitle("Agregar Vehículo");
+
+        DlgNewReserva winNew = new DlgNewReserva(
+                padre, true, listaReserva, listaCliente, listaVeh, 1);
+        winNew.setTitle("Agregar Reserva");
         winNew.setVisible(true);
-        this.listaVeh = winNew.getListaVeh();
+        this.listaReserva = winNew.getListaReservas();
         muestraTabla();
     }//GEN-LAST:event_btnInsertarActionPerformed
 
@@ -213,38 +213,49 @@ public class DlgMainReserva extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowActivated
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        if (tblReservas.getSelectedRowCount() == 1){
-            int resp = JOptionPane.showConfirmDialog(this, "¿Desea borrar el vehículo seleccionado?");
-            
-            if (resp == 0){  //El usuario desea borrar
-                int index = tblReservas.getSelectedRow();
-                
-                listaVeh.remove(index);
-                JOptionPane.showMessageDialog(this, "Vehículo eliminado");
-            }      
-        }else{
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un vehículo");
+        if (tblReservas.getSelectedRowCount() == 1) {
+            int resp = JOptionPane.showConfirmDialog(this,
+                    "¿Desea borrar la reserva seleccionada?");
+
+            if (resp == 0) {  //El usuario desea borrar
+                int fila = tblReservas.getSelectedRow();
+                int numeroReserva = Integer.parseInt(
+                        tblReservas.getValueAt(fila, 0).toString());
+                int index = buscarReserva(numeroReserva);
+
+                if (index != -1) {
+                    listaReserva.remove(index);
+                    muestraTabla();
+                    JOptionPane.showMessageDialog(this, "Reserva eliminada");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar una reserva");
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
-        String titulo[] = {"Placa", "Marca", "Modelo", "Transmición",
-            "Cilindraje", "Fecha Compra"};
-        Vehiculo veh;
+        String titulo[] = {"Número", "Fecha", "Cliente", "Vehículo",
+            "Días", "Precio por Día", "Impuesto", "Total"};
+        Reserva reserva;
 
         model = new DefaultTableModel(null, titulo);
-        for (int i = 0; i < listaVeh.size(); i++) {
-            
-            veh = listaVeh.get(i);
-            if (veh.getPlaca().toLowerCase().contains(txtBuscar.getText().toLowerCase())
-                    || veh.getMarca().toLowerCase().contains(txtBuscar.getText().toLowerCase())
-                    || veh.getModelo().toLowerCase().contains(txtBuscar.getText().toLowerCase())) {
-                Object row[] = {listaVeh.get(i).getPlaca(),
-                    listaVeh.get(i).getMarca(),
-                    listaVeh.get(i).getModelo(),
-                    listaVeh.get(i).getTransmision(),
-                    listaVeh.get(i).getCilindraje(),
-                    listaVeh.get(i).getFechaCompra()};
+        for (int i = 0; i < listaReserva.size(); i++) {
+
+            reserva = listaReserva.get(i);
+            if (String.valueOf(reserva.getNumReserva()).contains(txtBuscar.getText())
+                    || reserva.getCliente().getNombre().toLowerCase().contains(
+                            txtBuscar.getText().toLowerCase())
+                    || reserva.getVehiculo().getPlaca().toLowerCase().contains(
+                            txtBuscar.getText().toLowerCase())) {
+                Object row[] = {listaReserva.get(i).getNumReserva(),
+                    listaReserva.get(i).getFechaReserva(),
+                    listaReserva.get(i).getCliente().getNombre(),
+                    listaReserva.get(i).getVehiculo().getPlaca(),
+                    listaReserva.get(i).getCantDias(),
+                    listaReserva.get(i).getPrecioDia(),
+                    listaReserva.get(i).getImpuesto(),
+                    listaReserva.get(i).getTotal()};
                 model.addRow(row);
             }
         }
@@ -255,93 +266,106 @@ public class DlgMainReserva extends javax.swing.JDialog {
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         if (tblReservas.getSelectedRowCount() == 1) {
-            int index = tblReservas.getSelectedRow();
-             Vehiculo veh = new Vehiculo();
-             
-             veh.setPlaca(tblReservas.getValueAt(index, 0).toString());
-             veh.setMarca(tblReservas.getValueAt(index, 1).toString());
-             veh.setModelo(tblReservas.getValueAt(index, 2).toString());
-             veh.setTransmision(tblReservas.getValueAt(index, 3).toString());
-             veh.setCilindraje(Integer.parseInt(
-                     tblReservas.getValueAt(index, 4).toString()));
-             LocalDate fecha = LocalDate.parse(tblReservas.getValueAt(index, 5).toString());
-             
-             veh.setFechaCompra(fecha);
+            int fila = tblReservas.getSelectedRow();
+            int numeroReserva = Integer.parseInt(tblReservas.getValueAt(fila, 0).toString());
+            int index = buscarReserva(numeroReserva);
+            if (index == -1) {
+                JOptionPane.showMessageDialog(this, "No se encontró la reserva seleccionada");
+                return;
+            }
+            Reserva reserva = listaReserva.get(index);
             JFrame padre = (JFrame) this.getOwner();
-             DlgNewVehiculo winEdit = new DlgNewVehiculo(padre, true, listaVeh, 2, veh, 
-                     index);
-             winEdit.setLocationRelativeTo(null);
-             winEdit.setTitle("Editar Vehículo");
-             winEdit.setVisible(true);
-             this.listaVeh = winEdit.getListaVeh();
-             
+            DlgNewReserva winEdit = new DlgNewReserva(
+                    padre, true, listaReserva, listaCliente, listaVeh,
+                    2, reserva, index);
+            winEdit.setLocationRelativeTo(null);
+            winEdit.setTitle("Editar Reserva");
+            winEdit.setVisible(true);
+            this.listaReserva = winEdit.getListaReservas();
+            muestraTabla();
+
         } else {
             JOptionPane.showMessageDialog(this,
                     "Debe seleccionar un único registro");
         }
     }//GEN-LAST:event_btnEditarActionPerformed
 
+    private int buscarReserva(int numeroReserva) {
+        for (int i = 0; i < listaReserva.size(); i++) {
+            if (listaReserva.get(i).getNumReserva() == numeroReserva) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void muestraTabla() {
-        String titulo[] = {"Número", "Fecha", "Cliente", "Vehículo", 
+        String titulo[] = {"Número", "Fecha", "Cliente", "Vehículo",
             "Días", "Precio por Día", "Impuesto", "Total"};
 
         model = new DefaultTableModel(null, titulo);
-        for (int i = 0; i < listaVeh.size(); i++) {
-            Object row[] = {listaVeh.get(i).getPlaca(),
-                listaVeh.get(i).getMarca(), 
-                listaVeh.get(i).getModelo(),
-                listaVeh.get(i).getTransmision(), 
-                listaVeh.get(i).getCilindraje(),
-                listaVeh.get(i).getFechaCompra()};
-            model.addRow(row);
-        }
 
-        tblReservas.setModel(model);
-        txtCantReservas.setText(String.valueOf(tblReservas.getRowCount()));
+        for (int i = 0; i < listaReserva.size(); i++) {
+            Object row[] = {listaReserva.get(i).getNumReserva(),
+                listaReserva.get(i).getFechaReserva(),
+                listaReserva.get(i).getCliente().getNombre(),
+                listaReserva.get(i).getVehiculo().getPlaca(),
+                listaReserva.get(i).getCantDias(),
+                listaReserva.get(i).getPrecioDia(),
+                listaReserva.get(i).getImpuesto(),
+                listaReserva.get(i).getTotal()
+                };
+        model.addRow(row);
     }
-    
+
+    tblReservas.setModel (model);
+
+    txtCantReservas.setText (String.valueOf
+(tblReservas.getRowCount()));
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+     */
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DlgMainReserva dialog = new DlgMainReserva(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
+    } catch (ClassNotFoundException ex) {
+        java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+        java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+        java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        java.util.logging.Logger.getLogger(DlgMainReserva.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+    //</editor-fold>
+    //</editor-fold>
+
+    /* Create and display the dialog */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            DlgMainReserva dialog = new DlgMainReserva(new javax.swing.JFrame(), true);
+            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
+        }
+    });
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditar;

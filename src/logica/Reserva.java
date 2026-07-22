@@ -17,7 +17,9 @@ public class Reserva {
     private double impuesto;
     private double total;
 
-    public Reserva(int numReserva, LocalDate fechaReserva, Vehiculo vehiculo, int cantDias, double precioDia, double impuesto, double total) {
+    public Reserva(int numReserva, LocalDate fechaReserva, Cliente cliente,
+            Vehiculo vehiculo, int cantDias, double precioDia,
+            double impuesto, double total) {
         this.numReserva = numReserva;
         this.fechaReserva = fechaReserva;
         this.cliente = cliente;
