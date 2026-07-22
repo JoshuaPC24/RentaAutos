@@ -7,6 +7,9 @@ package vista;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import logica.Cliente;
+import logica.Reserva;
 import logica.Vehiculo;
 
 /**
@@ -16,8 +19,10 @@ import logica.Vehiculo;
 public class FrmSistemaReservaAutos extends javax.swing.JFrame {
 
     //VehiculoStore listaVeh = new VehiculoStore(5);
-    
     ArrayList<Vehiculo> listaVeh = new ArrayList();
+    ArrayList<Cliente> listaCliente = new ArrayList();
+    ArrayList<Reserva> listaReserva = new ArrayList();
+
     /**
      * Creates new form FrmSistemaReservaAutos
      */
@@ -62,6 +67,11 @@ public class FrmSistemaReservaAutos extends javax.swing.JFrame {
         btnReservas.setText("Gestión de Reservas");
         btnReservas.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnReservas.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnReservas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReservasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -117,7 +127,19 @@ public class FrmSistemaReservaAutos extends javax.swing.JFrame {
         this.listaVeh = winVeh.getListaVeh();
     }//GEN-LAST:event_btnVehiculosActionPerformed
 
-    
+    private void btnReservasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReservasActionPerformed
+        if (listaCliente.isEmpty() || listaVeh.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe registrar al menos un cliente y un vehículo antes de crear reservas");
+            return;
+        }
+        DlgMainReserva winReserva = new DlgMainReserva(this, false, listaReserva,listaCliente,listaVeh);
+        winReserva.setLocationRelativeTo(null);
+        winReserva.setVisible(true);
+        this.listaReserva = winReserva.getListaReserva();
+        
+
+    }//GEN-LAST:event_btnReservasActionPerformed
+
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().
@@ -125,6 +147,7 @@ public class FrmSistemaReservaAutos extends javax.swing.JFrame {
 
         return retValue;
     }
+
     /**
      * @param args the command line arguments
      */
