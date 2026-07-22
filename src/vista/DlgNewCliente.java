@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import logica.Cliente;
-import logica.Vehiculo;
 
 /**
  *
@@ -29,25 +28,7 @@ public class DlgNewCliente extends javax.swing.JDialog {
         initComponents();
         
     }
-         private Cliente getCliente() {
-    
-             int cedula = Integer.parseInt(txtCedula.getText());
-             
-             String nombre = txtNombre.getText();
-             
-             Cliente cliente = new Cliente();
-             
-             cliente.setCedula(cedula);
-             cliente.setNombre(nombre);
-             cliente.setGenero(genero);
-             cliente.setTelefono(Telefono);
-             cliente.setFechaNac(fechaNac);
-             cliente.setDireccion(direccion);
-             
-             
-             return cliente;
-    }
-         private boolean existeCedula(int cedula){
+    private boolean existeCedula(int cedula){
              
              for(Cliente c : listaClientes){
                  
@@ -70,7 +51,7 @@ public class DlgNewCliente extends javax.swing.JDialog {
 
     public DlgNewCliente(java.awt.Frame parent, boolean modal,
             ArrayList<Cliente> listaClientes, int operacion,
-            Cliente veh, int index) {
+            Cliente cliente, int index) {
         super(parent, modal);
         initComponents();
         this.listaClientes = listaClientes;
@@ -277,19 +258,14 @@ public class DlgNewCliente extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-
-        if (operacion == 1) {
-            int cedula = Integer.parseInt(txtCedula.getText());
-             if(existeCedula(cedula)) {
-                 JOptionPane.showMessageDialog(this, "La cedula ya existe");
-                 
-                 return;
-             }
-        }
         Cliente  cliente = getCliente();
         
         if(cliente != null) {
             if(operacion == 1) { //Se agrega nuevo cliente 
+                if(existeCedula(cliente.getCedula())) {
+                    JOptionPane.showMessageDialog(this, "La cedula ya existe");
+                    return;
+                }
                 
                 if(listaClientes.add(cliente)){
                     JOptionPane.showMessageDialog(this, "Cliente Guardado");
@@ -312,13 +288,14 @@ public class DlgNewCliente extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_formWindowActivated
 
-    private Cliente getClientes() {
+    private Cliente getCliente() {
         Cliente cliente = new Cliente();
 
         if (!txtCedula.getText().isEmpty()
                 && !txtNombre.getText().isEmpty()
                 && !txtGenero.getText().isEmpty()
                 && !txtTelefono.getText().isEmpty()
+                && !txtDireccion.getText().isEmpty()
                 && dtpFechaNac.getDate() != null) {
 
             try {
@@ -327,6 +304,7 @@ public class DlgNewCliente extends javax.swing.JDialog {
                 cliente.setGenero(txtGenero.getText());
                 cliente.setTelefono(Integer.parseInt(txtTelefono.getText()));
                 cliente.setFechaNac(dtpFechaNac.getDate());
+                cliente.setDireccion(txtDireccion.getText());
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Numero de telefono y cedula deben ser numericos");
                 return null;
@@ -344,17 +322,15 @@ public class DlgNewCliente extends javax.swing.JDialog {
         txtGenero.setText(cliente.getGenero());
         txtTelefono.setText(String.valueOf(cliente.getTelefono()));
         dtpFechaNac.setDate(cliente.getFechaNac());
+        txtDireccion.setText(cliente.getDireccion());
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {

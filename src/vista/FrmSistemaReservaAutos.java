@@ -63,6 +63,11 @@ public class FrmSistemaReservaAutos extends javax.swing.JFrame {
         btnClientes.setText("Gestión de Clientes");
         btnClientes.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnClientes.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClientesActionPerformed(evt);
+            }
+        });
 
         btnReservas.setText("Gestión de Reservas");
         btnReservas.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -139,6 +144,14 @@ public class FrmSistemaReservaAutos extends javax.swing.JFrame {
         
 
     }//GEN-LAST:event_btnReservasActionPerformed
+
+    private void btnClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientesActionPerformed
+        DlgGestionDeClientes winCliente = new DlgGestionDeClientes(
+                this, false, listaCliente);
+        winCliente.setLocationRelativeTo(null);
+        winCliente.setVisible(true);
+        this.listaCliente = winCliente.getListaCliente();
+    }//GEN-LAST:event_btnClientesActionPerformed
 
     @Override
     public Image getIconImage() {

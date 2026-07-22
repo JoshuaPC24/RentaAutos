@@ -5,12 +5,11 @@
 package vista;
 
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import logica.Vehiculo;
+import logica.Cliente;
 
 /**
  *
@@ -18,7 +17,7 @@ import logica.Vehiculo;
  */
 public class DlgGestionDeClientes extends javax.swing.JDialog {
 
-    private ArrayList<Vehiculo> listaVeh;
+    private ArrayList<Cliente> listaCliente;
     private DefaultTableModel model;
     /**
      * Creates new form DlgMainVehiculos
@@ -29,14 +28,14 @@ public class DlgGestionDeClientes extends javax.swing.JDialog {
     }
     
     public DlgGestionDeClientes(java.awt.Frame parent, boolean modal,
-            ArrayList<Vehiculo> listaVeh) {
+            ArrayList<Cliente> listaCliente) {
         super(parent, modal);
         initComponents();
-        this.listaVeh = listaVeh;
+        this.listaCliente = listaCliente;
     }
 
-    public ArrayList<Vehiculo> getListaVeh() {
-        return listaVeh;
+    public ArrayList<Cliente> getListaCliente() {
+        return listaCliente;
     }
 
     
@@ -191,10 +190,11 @@ public class DlgGestionDeClientes extends javax.swing.JDialog {
     private void btnInsertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertarActionPerformed
         JFrame padre = (JFrame) this.getOwner();
        
-        DlgNewVehiculo winNew = new DlgNewVehiculo(padre, true,listaVeh, 1);
-        winNew.setTitle("Agregar Vehículo");
+        DlgNewCliente winNew = new DlgNewCliente(padre, true, listaCliente, 1);
+        winNew.setLocationRelativeTo(null);
+        winNew.setTitle("Agregar Cliente");
         winNew.setVisible(true);
-        this.listaVeh = winNew.getListaVeh();
+        this.listaCliente = winNew.getListaClientes();
         muestraTabla();
     }//GEN-LAST:event_btnInsertarActionPerformed
 
@@ -204,66 +204,81 @@ public class DlgGestionDeClientes extends javax.swing.JDialog {
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         if (tblClientes.getSelectedRowCount() == 1){
-            int resp = JOptionPane.showConfirmDialog(this, "¿Desea borrar el vehículo seleccionado?");
+            int resp = JOptionPane.showConfirmDialog(this, "¿Desea borrar el cliente seleccionado?");
             
             if (resp == 0){  //El usuario desea borrar
-                int index = tblClientes.getSelectedRow();
+                int fila = tblClientes.getSelectedRow();
+                int cedula = Integer.parseInt(
+                        tblClientes.getValueAt(fila, 0).toString());
+                int index = buscarCliente(cedula);
                 
-                listaVeh.remove(index);
-                JOptionPane.showMessageDialog(this, "Vehículo eliminado");
+                if (index != -1) {
+                    listaCliente.remove(index);
+                    muestraTabla();
+                    JOptionPane.showMessageDialog(this, "Cliente eliminado");
+                }
             }      
         }else{
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un vehículo");
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente");
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void txtMostrarClienteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMostrarClienteKeyReleased
-        String titulo[] = {"Placa", "Marca", "Modelo", "Transmición",
-            "Cilindraje", "Fecha Compra"};
-        Vehiculo veh;
+        String titulo[] = {"Cédula", "Nombre", "Fecha Nacimiento", "Género",
+            "Teléfono", "Dirección"};
+        Cliente cliente;
 
         model = new DefaultTableModel(null, titulo);
-        for (int i = 0; i < listaVeh.size(); i++) {
+        for (int i = 0; i < listaCliente.size(); i++) {
             
-            veh = listaVeh.get(i);
-            if (veh.getPlaca().toLowerCase().contains(txtMostrarCliente.getText().toLowerCase())
-                    || veh.getMarca().toLowerCase().contains(txtMostrarCliente.getText().toLowerCase())
-                    || veh.getModelo().toLowerCase().contains(txtMostrarCliente.getText().toLowerCase())) {
-                Object row[] = {listaVeh.get(i).getPlaca(),
-                    listaVeh.get(i).getMarca(),
-                    listaVeh.get(i).getModelo(),
-                    listaVeh.get(i).getTransmision(),
-                    listaVeh.get(i).getCilindraje(),
-                    listaVeh.get(i).getFechaCompra()};
+            cliente = listaCliente.get(i);
+            if (String.valueOf(cliente.getCedula()).contains(txtMostrarCliente.getText())
+                    || cliente.getNombre().toLowerCase().contains(
+                            txtMostrarCliente.getText().toLowerCase())) {
+                Object row[] = {listaCliente.get(i).getCedula(),
+                    listaCliente.get(i).getNombre(),
+                    listaCliente.get(i).getFechaNac(),
+                    listaCliente.get(i).getGenero(),
+                    listaCliente.get(i).getTelefono(),
+                    listaCliente.get(i).getDireccion()};
                 model.addRow(row);
             }
         }
 
         tblClientes.setModel(model);
-        txtCantVehiculos.setText(String.valueOf(tblClientes.getRowCount()));
+        txtCantVehiculos.setText(String.valueOf(listaCliente.size()));
     }//GEN-LAST:event_txtMostrarClienteKeyReleased
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         if (tblClientes.getSelectedRowCount() == 1) {
-            int index = tblClientes.getSelectedRow();
-             Vehiculo veh = new Vehiculo();
+            int fila = tblClientes.getSelectedRow();
+            int cedula = Integer.parseInt(
+                    tblClientes.getValueAt(fila, 0).toString());
+            int index = buscarCliente(cedula);
+            if (index == -1) {
+                JOptionPane.showMessageDialog(this, "No se encontró el cliente seleccionado");
+                return;
+            }
+             Cliente cliente = new Cliente();
              
-             veh.setPlaca(tblClientes.getValueAt(index, 0).toString());
-             veh.setMarca(tblClientes.getValueAt(index, 1).toString());
-             veh.setModelo(tblClientes.getValueAt(index, 2).toString());
-             veh.setTransmision(tblClientes.getValueAt(index, 3).toString());
-             veh.setCilindraje(Integer.parseInt(
-                     tblClientes.getValueAt(index, 4).toString()));
-             LocalDate fecha = LocalDate.parse(tblClientes.getValueAt(index, 5).toString());
-             
-             veh.setFechaCompra(fecha);
+             cliente.setCedula(Integer.parseInt(
+                     tblClientes.getValueAt(fila, 0).toString()));
+             cliente.setNombre(tblClientes.getValueAt(fila, 1).toString());
+             cliente.setFechaNac(java.time.LocalDate.parse(
+                     tblClientes.getValueAt(fila, 2).toString()));
+             cliente.setGenero(tblClientes.getValueAt(fila, 3).toString());
+             cliente.setTelefono(Integer.parseInt(
+                     tblClientes.getValueAt(fila, 4).toString()));
+             cliente.setDireccion(tblClientes.getValueAt(fila, 5).toString());
+
             JFrame padre = (JFrame) this.getOwner();
-             DlgNewVehiculo winEdit = new DlgNewVehiculo(padre, true, listaVeh, 2, veh, 
+             DlgNewCliente winEdit = new DlgNewCliente(padre, true, listaCliente, 2, cliente,
                      index);
              winEdit.setLocationRelativeTo(null);
-             winEdit.setTitle("Editar Vehículo");
+             winEdit.setTitle("Editar Cliente");
              winEdit.setVisible(true);
-             this.listaVeh = winEdit.getListaVeh();
+             this.listaCliente = winEdit.getListaClientes();
+             muestraTabla();
              
         } else {
             JOptionPane.showMessageDialog(this,
@@ -271,27 +286,36 @@ public class DlgGestionDeClientes extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnEditarActionPerformed
 
+    private int buscarCliente(int cedula) {
+        for (int i = 0; i < listaCliente.size(); i++) {
+            if (listaCliente.get(i).getCedula() == cedula) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void txtMostrarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMostrarClienteActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtMostrarClienteActionPerformed
 
     private void muestraTabla() {
-        String titulo[] = {"Cedula", "Nombre", "FechaNac", "Genero", 
-            "telefono", "Direccion"};
+        String titulo[] = {"Cédula", "Nombre", "Fecha Nacimiento", "Género", 
+            "Teléfono", "Dirección"};
 
         model = new DefaultTableModel(null, titulo);
-        for (int i = 0; i < listaVeh.size(); i++) {
-            Object row[] = {listaVeh.get(i).getPlaca(),
-                listaVeh.get(i).getMarca(), 
-                listaVeh.get(i).getModelo(),
-                listaVeh.get(i).getTransmision(), 
-                listaVeh.get(i).getCilindraje(),
-                listaVeh.get(i).getFechaCompra()};
+        for (int i = 0; i < listaCliente.size(); i++) {
+            Object row[] = {listaCliente.get(i).getCedula(),
+                listaCliente.get(i).getNombre(), 
+                listaCliente.get(i).getFechaNac(),
+                listaCliente.get(i).getGenero(), 
+                listaCliente.get(i).getTelefono(),
+                listaCliente.get(i).getDireccion()};
             model.addRow(row);
         }
 
         tblClientes.setModel(model);
-        txtCantVehiculos.setText(String.valueOf(tblClientes.getRowCount()));
+        txtCantVehiculos.setText(String.valueOf(listaCliente.size()));
     }
     
     /**
