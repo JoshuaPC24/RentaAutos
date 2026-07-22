@@ -16,6 +16,7 @@ public class RentaAutos {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
         FrmSistemaReservaAutos win = new FrmSistemaReservaAutos();
         win.setLocationRelativeTo(null);
         win.setVisible(true);
